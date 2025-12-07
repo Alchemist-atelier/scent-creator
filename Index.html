@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Alchemist Atelier - Scent Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-disconnected {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid rgba(255, 0, 0, 0.5);
+        }
+
+        .status-connected {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid rgba(0, 255, 0, 0.5);
+        }
+
+        .cartridge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .cartridge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .cartridge-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .cartridge-category {
+            font-size: 0.85em;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f5576c;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f5576c;
+            cursor: pointer;
+            border: none;
+        }
+
+        .intensity-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .formula-name {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        .formula-name::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .saved-formulas {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .formula-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .formula-info {
+            flex: 1;
+        }
+
+        .formula-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .formula-composition {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .formula-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-load {
+            background: #4ade80;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .message-success {
+            background: rgba(74, 222, 128, 0.2);
+            border: 2px solid rgba(74, 222, 128, 0.5);
+        }
+
+        .message-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid rgba(239, 68, 68, 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚗️ The Alchemist Atelier</h1>
+            <p>Scent Creator</p>
+        </div>
+
+        <div class="card">
+            <div id="status" class="status status-disconnected">
+                🔴 Déconnecté
+            </div>
+            <button id="connectBtn" class="btn btn-primary">
+                📡 Connecter le Scent Creator
+            </button>
+        </div>
+
+        <div id="message" class="hidden"></div>
+
+        <div id="devicePanel" class="hidden">
+            <div class="tabs">
+                <div class="tab active" data-tab="create">Créer</div>
+                <div class="tab" data-tab="saved">Mes Formules</div>
+            </div>
+
+            <div id="createTab" class="tab-content active">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">🧪 Composer votre parfum</h2>
+                    
+                    <div id="cartridges"></div>
+
+                    <input type="text" id="formulaName" class="formula-name" placeholder="Nom de votre création...">
+                    
+                    <button id="createBtn" class="btn btn-primary">
+                        ✨ Créer le parfum
+                    </button>
+                    
+                    <button id="saveBtn" class="btn btn-secondary">
+                        💾 Sauvegarder la formule
+                    </button>
+                </div>
+            </div>
+
+            <div id="savedTab" class="tab-content">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">📚 Formules sauvegardées</h2>
+                    <div id="savedFormulas" class="saved-formulas"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cartouches disponibles dans The Alchemist Atelier
+        const CARTRIDGES = [
+            { id: 1, name: 'Rose', category: 'Floral', color: '#ff69b4' },
+            { id: 2, name: 'Jasmin', category: 'Floral', color: '#f0e68c' },
+            { id: 3, name: 'Lavande', category: 'Floral', color: '#9370db' },
+            { id: 4, name: 'Bergamote', category: 'Agrume', color: '#ffa500' },
+            { id: 5, name: 'Citron', category: 'Agrume', color: '#ffff00' },
+            { id: 6, name: 'Pamplemousse', category: 'Agrume', color: '#ff6347' },
+            { id: 7, name: 'Vanille', category: 'Gourmand', color: '#f5deb3' },
+            { id: 8, name: 'Cacao', category: 'Gourmand', color: '#8b4513' },
+            { id: 9, name: 'Amande', category: 'Gourmand', color: '#d2691e' },
+            { id: 10, name: 'Cèdre', category: 'Boisé', color: '#8b7355' },
+            { id: 11, name: 'Santal', category: 'Boisé', color: '#a0826d' },
+            { id: 12, name: 'Patchouli', category: 'Boisé', color: '#6b4423' },
+            { id: 13, name: 'Musc', category: 'Oriental', color: '#e6d3c8' },
+            { id: 14, name: 'Ambre', category: 'Oriental', color: '#ffbf00' },
+            { id: 15, name: 'Encens', category: 'Oriental', color: '#708090' }
+        ];
+
+        let device = null;
+        let deviceCharacteristic = null;
+        let currentFormula = {};
+        let savedFormulas = [];
+
+        // Charger les formules sauvegardées
+        function loadSavedFormulas() {
+            const saved = localStorage.getItem('taa_formulas');
+            if (saved) {
+                savedFormulas = JSON.parse(saved);
+                displaySavedFormulas();
+            }
+        }
+
+        // Afficher les formules sauvegardées
+        function displaySavedFormulas() {
+            const container = document.getElementById('savedFormulas');
+            
+            if (savedFormulas.length === 0) {
+                container.innerHTML = '<p style="text-align: center; opacity: 0.6;">Aucune formule sauvegardée</p>';
+                return;
+            }
+
+            container.innerHTML = savedFormulas.map((formula, index) => {
+                const composition = Object.entries(formula.values)
+                    .filter(([_, v]) => v > 0)
+                    .map(([id, v]) => {
+                        const cart = CARTRIDGES.find(c => c.id == id);
+                        return `${cart.name} (${v}%)`;
+                    })
+                    .join(', ');
+
+                return `
+                    <div class="formula-item">
+                        <div class="formula-info">
+                            <div class="formula-title">${formula.name}</div>
+                            <div class="formula-composition">${composition}</div>
+                        </div>
+                        <div class="formula-actions">
+                            <button class="btn-small btn-load" onclick="loadFormula(${index})">📂 Charger</button>
+                            <button class="btn-small btn-delete" onclick="deleteFormula(${index})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Charger une formule
+        window.loadFormula = function(index) {
+            const formula = savedFormulas[index];
+            currentFormula = { ...formula.values };
+            
+            // Mettre à jour les sliders
+            Object.entries(currentFormula).forEach(([id, value]) => {
+                const slider = document.getElementById(`slider-${id}`);
+                const label = document.getElementById(`value-${id}`);
+                if (slider && label) {
+                    slider.value = value;
+                    label.textContent = `${value}%`;
+                }
+            });
+
+            document.getElementById('formulaName').value = formula.name;
+            
+            // Revenir à l'onglet création
+            document.querySelector('[data-tab="create"]').click();
+            
+            showMessage(`Formule "${formula.name}" chargée`, 'success');
+        };
+
+        // Supprimer une formule
+        window.deleteFormula = function(index) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette formule ?')) {
+                savedFormulas.splice(index, 1);
+                localStorage.setItem('taa_formulas', JSON.stringify(savedFormulas));
+                displaySavedFormulas();
+                showMessage('Formule supprimée', 'success');
+            }
+        };
+
+        // Initialiser les cartouches
+        function initializeCartridges() {
+            const container = document.getElementById('cartridges');
+            container.innerHTML = CARTRIDGES.map(cart => {
+                currentFormula[cart.id] = 0;
+                return `
+                    <div class="cartridge">
+                        <div class="cartridge-header">
+                            <div>
+                                <div class="cartridge-name">${cart.name}</div>
+                                <div class="cartridge-category">${cart.category}</div>
+                            </div>
+                            <div id="value-${cart.id}" style="font-size: 1.2em; font-weight: bold;">0%</div>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="slider-${cart.id}" class="slider" min="0" max="100" value="0">
+                            <div class="intensity-label">
+                                <span>0%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Ajouter les événements
+            CARTRIDGES.forEach(cart => {
+                const slider = document.getElementById(`slider-${cart.id}`);
+                const label = document.getElementById(`value-${cart.id}`);
+                
+                slider.addEventListener('input', (e) => {
+                    const value = parseInt(e.target.value);
+                    label.textContent = `${value}%`;
+                    currentFormula[cart.id] = value;
+                });
+            });
+        }
+
+        // Connexion Bluetooth
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            try {
+                showMessage('Recherche du Scent Creator...', 'success');
+                
+                // Recherche de l'appareil Bluetooth
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [
+                        { name: 'Alchemist' },
+                        { name: 'TAA' },
+                        { namePrefix: 'Scent' }
+                    ],
+                    optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb']
+                });
+
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+                deviceCharacteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+
+                document.getElementById('status').className = 'status status-connected';
+                document.getElementById('status').innerHTML = '🟢 Connecté - ' + device.name;
+                document.getElementById('connectBtn').textContent = '✅ Connecté';
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('devicePanel').classList.remove('hidden');
+
+                initializeCartridges();
+                loadSavedFormulas();
+
+                showMessage('Scent Creator connecté avec succès !', 'success');
+
+            } catch (error) {
+                console.error('Erreur de connexion:', error);
+                showMessage('Erreur: ' + error.message + '. Assurez-vous que le Bluetooth est activé et que l\'appareil est allumé.', 'error');
+            }
+        });
+
+        // Créer le parfum
+        document.getElementById('createBtn').addEventListener('click', async () => {
+            if (!deviceCharacteristic) {
+                showMessage('Veuillez d\'abord connecter le Scent Creator', 'error');
+                return;
+            }
+
+            const total = Object.values(currentFormula).reduce((a, b) => a + b, 0);
+            
+            if (total === 0) {
+                showMessage('Veuillez sélectionner au moins une note', 'error');
+                return;
+            }
+
+            try {
+                showMessage('Création du parfum en cours...', 'success');
+
+                // Envoyer les commandes à l'appareil
+                for (const [cartridgeId, intensity] of Object.entries(currentFormula)) {
+                    if (intensity > 0) {
+                        // Format de commande: [START_BYTE, CARTRIDGE_ID, INTENSITY, END_BYTE]
+                        const command = new Uint8Array([0xFF, parseInt(cartridgeId), intensity, 0xFE]);
+                        await deviceCharacteristic.writeValue(command);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                }
+
+                showMessage('✨ Parfum créé avec succès !', 'success');
+
+            } catch (error) {
+                console.error('Erreur de création:', error);
+                showMessage('Erreur lors de la création: ' + error.message, 'error');
+            }
+        });
+
+        // Sauvegarder la formule
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            const name = document.getElementById('formulaName').value.trim();
+            
+            if (!name) {
+                showMessage('Veuillez donner un nom à votre formule', 'error');
+                return;
+            }
+
+            const total = Object.values(currentFormula).reduce((a, b) => a + b, 0);
+            
+            if (total === 0) {
+                showMessage('Veuillez sélectionner au moins une note', 'error');
+                return;
+            }
+
+            const formula = {
+                name: name,
+                values: { ...currentFormula },
+                date: new Date().toISOString()
+            };
+
+            savedFormulas.push(formula);
+            localStorage.setItem('taa_formulas', JSON.stringify(savedFormulas));
+            
+            showMessage(`Formule "${name}" sauvegardée !`, 'success');
+            displaySavedFormulas();
+            
+            document.getElementById('formulaName').value = '';
+        });
+
+        // Gestion des onglets
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tabName + 'Tab').classList.add('active');
+            });
+        });
+
+        // Afficher un message
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.className = `message message-${type}`;
+            messageEl.textContent = text;
+            messageEl.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageEl.classList.add('hidden');
+            }, 4000);
+        }
+
+        // Vérifier le support Bluetooth
+        if (!navigator.bluetooth) {
+            showMessage('Bluetooth Web API non disponible. Utilisez Chrome sur Android.', 'error');
+        }
+    </script>
+</body>
+</html>
